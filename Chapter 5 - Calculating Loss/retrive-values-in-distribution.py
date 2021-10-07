@@ -25,7 +25,7 @@ Loss = -np.log(softmaxOutputs[
     range(len(softmaxOutputs)), classTargets
 ])
 
-print('Loss: ', Loss)
+print('-log: ', Loss)
 
 averageLoss = np.mean(Loss)
-print('Average loss: ', averageLoss)
+print('Average -log: ', averageLoss)
