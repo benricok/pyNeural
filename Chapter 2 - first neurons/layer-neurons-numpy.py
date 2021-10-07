@@ -8,3 +8,5 @@ biases = [2.0, 3.0, 0.5]
 layer_outputs = np.dot(weights, inputs) + biases
 
 print(layer_outputs)
+
+# https://nnfs.io/cyx
