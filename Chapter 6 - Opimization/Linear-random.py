@@ -82,9 +82,9 @@ class Loss_CategorialCrossentropy(Loss):
 X, y = vertical_data(samples=100, classes=3)
 
 # Network model creation
-dense1 = LayerDense(2, 3)
+dense1 = LayerDense(2, 4)
 activation1 = ActivationReLU()
-dense2 = LayerDense(3, 3)
+dense2 = LayerDense(4, 3)
 activation2 = ActivationSoftMAX()
 
 # Create loss function
@@ -99,10 +99,10 @@ best_dense2_biases = dense2.biases.copy()
 
 for iteration in range(10000):
     # Update weights with some small random values
-    dense1.weights += 0.05 * np.random.randn(2, 3)
-    dense1.biases += 0.05 * np.random.randn(1, 3)
-    dense1.weights += 0.05 * np.random.randn(2, 3)
-    dense1.biases += 0.05 * np.random.randn(1, 3)
+    dense1.weights += 0.05 * np.random.randn(2, 4)
+    dense1.biases += 0.05 * np.random.randn(1, 4)
+    dense2.weights += 0.05 * np.random.randn(4, 3)
+    dense2.biases += 0.05 * np.random.randn(1, 3)
 
     # Preform pass of our training data through this layer
     dense1.forward(X)
@@ -135,4 +135,8 @@ for iteration in range(10000):
         dense2.weights = best_dense2_weights.copy()
         dense2.biases = best_dense2_biases.copy()
 
+print('Dense1 weights:', best_dense1_weights)
+print('Dense1 biases: ', best_dense1_biases)
+print('Dense2 weights:', best_dense2_weights)
+print('Dense2 biases: ', best_dense2_biases)
 # https://nnfs.io/ch6
