@@ -6,7 +6,6 @@ nnfs.init()
 
 
 class LayerDense:
-
     # Layer initialization
     def __init__(self, n_inputs, n_neurons):
         # Initialize weight and biases
@@ -19,7 +18,6 @@ class LayerDense:
 
 
 class ActivationSoftMAX:
-
     # Forward pass
     def forward(self, inputs):
         # Get unnormalized propabilities
@@ -30,14 +28,12 @@ class ActivationSoftMAX:
 
 
 class ActivationReLU:
-
     # Forward pass
     def forward(self, inputs):
         self.output = np.maximum(0, inputs)
 
 
 class Loss:
-
     # Calculates the data and regularization losses
     # given model output and ground truth values
     def calculate(self, output, y):
@@ -49,7 +45,6 @@ class Loss:
 
 
 class Loss_CategorialCrossentropy(Loss):
-
     def forward(self, y_pred, y_true):
         # Number of samples in a batch
         samples = len(y_pred)
