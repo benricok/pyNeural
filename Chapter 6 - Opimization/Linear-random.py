@@ -74,12 +74,12 @@ class Loss_CategorialCrossentropy(Loss):
 
 
 # Create dataset
-X, y = vertical_data(samples=100, classes=3)
+X, y = vertical_data(samples=10000, classes=3)
 
 # Network model creation
-dense1 = LayerDense(2, 4)
+dense1 = LayerDense(2, 16)
 activation1 = ActivationReLU()
-dense2 = LayerDense(4, 3)
+dense2 = LayerDense(16, 3)
 activation2 = ActivationSoftMAX()
 
 # Create loss function
@@ -92,11 +92,11 @@ best_dense1_biases = dense1.biases.copy()
 best_dense2_weights = dense2.weights.copy()
 best_dense2_biases = dense2.biases.copy()
 
-for iteration in range(8000):
+for iteration in range(2000):
     # Update weights with some small random values
-    dense1.weights += 0.005 * np.random.randn(2, 4)
-    dense1.biases += 0.005 * np.random.randn(1, 4)
-    dense2.weights += 0.005 * np.random.randn(4, 3)
+    dense1.weights += 0.005 * np.random.randn(2, 16)
+    dense1.biases += 0.005 * np.random.randn(1, 16)
+    dense2.weights += 0.005 * np.random.randn(16, 3)
     dense2.biases += 0.005 * np.random.randn(1, 3)
 
     # Preform pass of our training data through this layer

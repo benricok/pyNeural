@@ -1,9 +1,10 @@
 import numpy as np
 from nnfs.datasets import spiral_data
 import nnfs
+import matplotlib.pyplot as plt
 
 nnfs.init()
-
+plt.ion()
 
 class LayerDense:
     # Layer initialization
@@ -185,7 +186,7 @@ loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
 optimizer = Optimizer_SGD()
 
 # Training loop
-for epoch in range(100001):
+for epoch in range(1000):
     # Perform forward pass of out training data through first layer
     dense1.forward(X)
 
@@ -209,7 +210,11 @@ for epoch in range(100001):
         print(f'epoch: {epoch}, ' +
               f'acc: {accuracy:.3f}, ' +
               f'loss: {loss:.3f}')
-
+        plt.plot(range(round(epoch*100)), range(round(accuracy*100)))
+        plt.plot(str(accuracy))
+        plt.draw()
+        plt.pause(0.1)
+    
     # Backward pass
     loss_activation.backward(loss_activation.output, y)
     dense2.backward(loss_activation.dinputs)
@@ -225,4 +230,5 @@ print(dense1.dbiases)
 print(dense2.dweights)
 print(dense2.dbiases)
 
+plt.show(block=True)
 # https://nnfs.io/pup
