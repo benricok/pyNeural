@@ -187,6 +187,8 @@ optimizer = Optimizer_SGD()
 
 # Training loop
 for epoch in range(1000):
+    aEpoch = np.array([])
+    
     # Perform forward pass of out training data through first layer
     dense1.forward(X)
 
@@ -210,10 +212,10 @@ for epoch in range(1000):
         print(f'epoch: {epoch}, ' +
               f'acc: {accuracy:.3f}, ' +
               f'loss: {loss:.3f}')
-        plt.plot(range(round(epoch*100)), range(round(accuracy*100)))
-        plt.plot(str(accuracy))
-        plt.draw()
-        plt.pause(0.1)
+        aEpoch = np.append(aEpoch, epoch)
+        #aAcc.append(accuracy)
+        #aLoss.append(loss)
+        
     
     # Backward pass
     loss_activation.backward(loss_activation.output, y)
@@ -230,5 +232,6 @@ print(dense1.dbiases)
 print(dense2.dweights)
 print(dense2.dbiases)
 
+plt.plot(aEpoch, linestyle = 'dotted')
 plt.show(block=True)
 # https://nnfs.io/pup
