@@ -160,17 +160,62 @@ class Activation_Softmax_Loss_CategoricalCrossentropy():
         self.dinputs = self.dinputs / samples
 
 
+# SGD optimizer
 class Optimizer_SGD:
     # Initialize optimizer - set settings,
-    # learning rate of 1. is default fot this optimizer
-    def __init__(self, learning_rate=1.0):
+    # learning rate of 1. is default for this optimizer
+    def __init__(self, learning_rate=1., decay=0., momentum=0.):
         self.learning_rate = learning_rate
-
+        self.current_learning_rate = learning_rate
+        self.decay = decay
+        self.iterations = 0
+        self.momentum = momentum
+        
+    # Call once before any parameter updates
+    def pre_update_params(self):
+        if self.decay:
+            self.current_learning_rate = self.learning_rate * \
+                (1. / (1. + self.decay * self.iterations))
+                
     # Update parameters
     def update_params(self, layer):
-        layer.weights += -self.learning_rate * layer.dweights
-        layer.biases += -self.learning_rate * layer.dbiases
-
+        # If we use momentum
+        if self.momentum:
+            # If layer does not contain momentum arrays, create them
+            # filled with zeros
+            if not hasattr(layer, 'weight_momentums'):
+                layer.weight_momentums = np.zeros_like(layer.weights)
+                # If there is no momentum array for weights
+                # The array doesn't exist for biases yet either.
+                layer.bias_momentums = np.zeros_like(layer.biases)
+                
+            # Build weight updates with momentum - take previous
+            # updates multiplied by retain factor and update with
+            # current gradients
+            weight_updates = \
+                self.momentum * layer.weight_momentums - \
+                self.current_learning_rate * layer.dweights
+            layer.weight_momentums = weight_updates
+            
+            # Build bias updates
+            bias_updates = \
+                self.momentum * layer.bias_momentums - \
+                self.current_learning_rate * layer.dbiases
+            layer.bias_momentums = bias_updates
+            
+        # Vanilla SGD updates (as before momentum update)
+        else:
+            weight_updates = -self.current_learning_rate * layer.dweights
+            bias_updates = -self.current_learning_rate * layer.dbiases
+            
+        # Update weights and biases using either
+        # vanilla or momentum updates
+        layer.weights += weight_updates
+        layer.biases += bias_updates
+        
+    # Call once after any parameter updates
+    def post_update_params(self):
+        self.iterations += 1
 
 X, y = spiral_data(samples=100, classes=3)
 
@@ -183,12 +228,10 @@ dense2 = LayerDense(64, 3)
 loss_activation = Activation_Softmax_Loss_CategoricalCrossentropy()
 
 # Create optimizer
-optimizer = Optimizer_SGD()
+optimizer = Optimizer_SGD(decay=1e-3, momentum=0.9) # 0.001
 
 # Training loop
-for epoch in range(1000):
-    aEpoch = np.array([])
-    
+for epoch in range(10001):
     # Perform forward pass of out training data through first layer
     dense1.forward(X)
 
@@ -211,11 +254,8 @@ for epoch in range(1000):
     if not epoch % 100:
         print(f'epoch: {epoch}, ' +
               f'acc: {accuracy:.3f}, ' +
-              f'loss: {loss:.3f}')
-        aEpoch = np.append(aEpoch, epoch)
-        #aAcc.append(accuracy)
-        #aLoss.append(loss)
-        
+              f'loss: {loss:.3f}, ' +
+              f'lr: {optimizer.current_learning_rate}')
     
     # Backward pass
     loss_activation.backward(loss_activation.output, y)
@@ -224,14 +264,14 @@ for epoch in range(1000):
     dense1.backward(activation1.dinputs)
 
     # Update weights and biases
+    optimizer.pre_update_params()
     optimizer.update_params(dense1)
     optimizer.update_params(dense2)
+    optimizer.post_update_params()
 
 print(dense1.dweights)
 print(dense1.dbiases)
 print(dense2.dweights)
 print(dense2.dbiases)
 
-plt.plot(aEpoch, linestyle = 'dotted')
-plt.show(block=True)
 # https://nnfs.io/pup
