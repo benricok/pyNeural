@@ -1188,6 +1188,43 @@ class Model:
 
         # Return a model
         return model
+    
+    # Predicts on the samples
+    def predict(self, X, *, batch_size=None):
+        # Default value if batch size is not being set
+        prediction_steps = 1
+        # Calculate number of steps
+        if batch_size is not None:
+            prediction_steps = len(X) // batch_size
+            # Dividing rounds down. If there are some remaining
+            # data, but not a full batch, this won't include it
+            # Add `1` to include this not full batch
+            if prediction_steps * batch_size < len(X):
+                prediction_steps += 1
+                
+        # Model outputs
+        output = []
+        
+        # Iterate over steps
+        for step in range(prediction_steps):
+            # If batch size is not set -
+            # train using one step and full dataset
+            if batch_size is None:
+                batch_X = X
+                
+            # Otherwise slice a batch
+            else:
+                batch_X = X[step*batch_size:(step+1)*batch_size]
+                
+            # Perform the forward pass
+            batch_output = self.forward(batch_X, training=False)
+            
+            # Append batch prediction to the list of predictions
+            output.append(batch_output)
+            
+        # Stack and return results
+        return np.vstack(output)
+
 
 
 # Loads a MNIST dataset
@@ -1227,8 +1264,6 @@ def create_data_mnist(path):
     # And return all the data
     return X, y, X_test, y_test
 
-
-
 # Label index to label name relation
 fashion_mnist_labels = {
     0: 'T-shirt/top',
@@ -1243,28 +1278,87 @@ fashion_mnist_labels = {
     9: 'Ankle boot'
 }
 
-# Read an image
-image_data = cv2.imread('pants.png', cv2.IMREAD_GRAYSCALE)
+def predictOnImage(imagePath = 'pants.png', modelPath = 'fashion_mnist.model'):
+    # Read an image
+    image_data = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
 
-# Resize to the same size as Fashion MNIST images
-image_data = cv2.resize(image_data, (28, 28))
+    # Resize to the same size as Fashion MNIST images
+    image_data = cv2.resize(image_data, (28, 28))
 
-# Invert image colors
-image_data = 255 - image_data
+    # Invert image colors
+    image_data = 255 - image_data
 
-# Reshape and scale pixel data
-image_data = (image_data.reshape(1, -1).astype(np.float32) - 127.5) / 127.5
+    # Reshape and scale pixel data
+    image_data = (image_data.reshape(1, -1).astype(np.float32) - 127.5) / 127.5
 
-# Load the model
-model = Model.load('fashion_mnist.model')
+    # Load the model
+    model = Model.load(modelPath)
 
-# Predict on the image
-confidences = model.predict(image_data)
+    # Predict on the image
+    confidences = model.predict(image_data)
 
-# Get prediction instead of confidence levels
-predictions = model.output_layer_activation.predictions(confidences)
+    # Get prediction instead of confidence levels
+    predictions = model.output_layer_activation.predictions(confidences)
 
-# Get label name from label index
-prediction = fashion_mnist_labels[predictions[0]]
+    # Get label name from label index
+    prediction = fashion_mnist_labels[predictions[0]]
 
-print(prediction)
+    print(prediction)
+    
+DATASETS = "C:\\Users\\bkadmin\\Documents\\Datasets\\"  
+  
+def trainModel(path = DATASETS + '\\fashion_mnist_images'):
+    X, y, X_test, y_test = create_data_mnist(path)
+    
+    # Shuffle the training dataset
+    keys = np.array(range(X.shape[0]))
+    np.random.shuffle(keys)
+    X = X[keys]
+    y = y[keys]
+
+    # Scale and reshape samples
+    X = (X.reshape(X.shape[0], -1).astype(np.float32) - 127.5) / 127.5
+    X_test = (X_test.reshape(X_test.shape[0], -1).astype(np.float32) -
+        127.5) / 127.5
+
+    print(X.min(), X.max())
+    print(X.shape)
+
+    # Instantiate the model
+    model = Model()
+    
+    # Add layers
+    model.add(Layer_Dense(X.shape[1], 64))
+    model.add(Activation_ReLU())
+    model.add(Layer_Dense(64, 64))
+    model.add(Activation_ReLU())
+    model.add(Layer_Dense(64, 10))
+    model.add(Activation_Softmax())
+    
+    # Set loss, optimizer and accuracy objects
+    model.set(
+        loss=Loss_CategoricalCrossentropy(),
+        optimizer=Optimizer_Adam(decay=5e-5),
+        accuracy=Accuracy_Categorical()
+    )
+    
+    # Finalize the model
+    model.finalize()
+    
+    # Train the model
+    model.train(X, y, validation_data=(X_test, y_test),
+        epochs=5, batch_size=128, print_every=100)
+    
+    # Retrieve and print parameters
+    #parameters = model.get_parameters()
+    #print(parameters)
+    
+    print('done!')
+    model.evaluate(X, y)
+
+    model.save_parameters('C:\\Users\\bkadmin\\Documents\\Models\\' + 'fashion_mnist.parms')
+
+#trainModel()
+
+predictOnImage(DATASETS + 'fashion_mnist_images\\test\\4\\0000.png',
+            'C:\\Users\\bkadmin\\Documents\\Models\\fashion_mnist.parms')
