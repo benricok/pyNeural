@@ -1280,6 +1280,11 @@ fashion_mnist_labels = {
 }    
   
 def trainModel(pathDataset, pathParams, pathModel):
+    # Start timer
+    start = timeit.default_timer()
+    
+    # Create dataset
+    print('\nImporting dataset: ' + pathDataset)
     X, y, X_test, y_test = create_data_mnist(pathDataset)
     
     # Shuffle the training dataset
@@ -1289,17 +1294,22 @@ def trainModel(pathDataset, pathParams, pathModel):
     y = y[keys]
 
     # Scale and reshape samples
+    print('Scale and reshape samples from dataset')
     X = (X.reshape(X.shape[0], -1).astype(np.float32) - 127.5) / 127.5
-    X_test = (X_test.reshape(X_test.shape[0], -1).astype(np.float32) -
-        127.5) / 127.5
+    X_test = (X_test.reshape(X_test.shape[0], -1).astype(np.float32) - 127.5) / 127.5
 
+    # Double check range and shape
+    print('Dataset min and max range:')
     print(X.min(), X.max())
+    print('Dataset shape:')
     print(X.shape)
 
     # Instantiate the model
+    print('\nCreating the model')
     model = Model()
     
     # Add layers
+    print('Adding layers to the model')
     model.add(Layer_Dense(X.shape[1], 64))
     model.add(Activation_ReLU())
     model.add(Layer_Dense(64, 64))
@@ -1308,6 +1318,7 @@ def trainModel(pathDataset, pathParams, pathModel):
     model.add(Activation_Softmax())
     
     # Set loss, optimizer and accuracy objects
+    print('Setting the loss, optimizer and accuracy functions')
     model.set(
         loss=Loss_CategoricalCrossentropy(),
         optimizer=Optimizer_Adam(decay=5e-5),
@@ -1315,22 +1326,30 @@ def trainModel(pathDataset, pathParams, pathModel):
     )
     
     # Finalize the model
+    print('Finalizing the model')
     model.finalize()
+    print('\nDone importing the dataset and creating the model \nTook: ', round(timeit.default_timer() - start, 2), 'seconds') 
     
     # Train the model
+    print('\nStarting training:\n')
+    start = timeit.default_timer()
     model.train(X, y, validation_data=(X_test, y_test),
         epochs=10, batch_size=128, print_every=100)
+    print('\nDONE TRAINING \nTook: ', round(timeit.default_timer() - start, 2), 'seconds\n') 
     
     # Retrieve and print parameters
     #parameters = model.get_parameters()
     #print(parameters)
     
-    print('DONE TRAINING - Final evaluation:')
+    print('Final model evaluation against training dataset:')
     model.evaluate(X, y)
+    
+    print('Final model evaluation against test dataset:')
+    model.evaluate(X_test, y_test)
 
     model.save_parameters(pathParams)
     model.save(pathModel)
-    print('Model and Params saved to:')
+    print('\nModel and Params saved to:')
     print('Params: ' + pathParams)
     print('Model: ' + pathModel)
 
@@ -1339,7 +1358,7 @@ def predictOnImages(datasetpath, modelPath):
     start = timeit.default_timer()
     
     # Create dataset
-    print('\n Loading dataset: ' + datasetpath)
+    print('\n Importing dataset: ' + datasetpath)
     X, y, X_test, y_test = create_data_mnist(datasetpath)
     
     # Scale and reshape samples
@@ -1347,7 +1366,7 @@ def predictOnImages(datasetpath, modelPath):
     X_test = (X_test.reshape(X_test.shape[0], -1).astype(np.float32) - 127.5) / 127.5
     
     # Load the model
-    print('Loading the model: ' + modelPath)
+    print('Importing the model: ' + modelPath)
     model = Model.load(modelPath)
     
     print('DONE! \nTook: ', round(timeit.default_timer() - start, 2), 'seconds') 
@@ -1359,6 +1378,9 @@ def predictOnImages(datasetpath, modelPath):
     confidences = model.predict(X_test[:j])
     print('\nConfidences: ')
     print(confidences)
+    
+    print('\nModel evaluation against test dataset:')
+    model.evaluate(X_test, y_test)
     
     # Get prediction instead of confidence levels
     predictions = model.output_layer_activation.predictions(confidences)
@@ -1401,5 +1423,5 @@ BASEPATH = "C:\\Users\\bkadmin\\Documents\\"
 #           BASEPATH + '\\Models\\fashion_mnist.parms',
 #           BASEPATH + '\\Models\\fashion_mnist.model')
 
-predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
-                BASEPATH + '\\Models\\fashion_mnist.model')
+#predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
+#                BASEPATH + '\\Models\\fashion_mnist.model')
