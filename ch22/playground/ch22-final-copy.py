@@ -1370,7 +1370,10 @@ def predictOnImages(datasetpath, modelPath):
     model = Model.load(modelPath)
     
     print('DONE! \nTook: ', round(timeit.default_timer() - start, 2), 'seconds') 
-
+    
+    print('\nModel evaluation against test dataset:')
+    model.evaluate(X_test, y_test)
+    
     # Predict on the first j samples from validation dataset
     # and print the result
     j = 5
@@ -1378,9 +1381,6 @@ def predictOnImages(datasetpath, modelPath):
     confidences = model.predict(X_test[:j])
     print('\nConfidences: ')
     print(confidences)
-    
-    print('\nModel evaluation against test dataset:')
-    model.evaluate(X_test, y_test)
     
     # Get prediction instead of confidence levels
     predictions = model.output_layer_activation.predictions(confidences)
@@ -1394,29 +1394,42 @@ def predictOnImages(datasetpath, modelPath):
     for prediction in predictions:
         print(fashion_mnist_labels[prediction])
     
-# Read an image
-    #image_data = cv2.imread(imagePath, cv2.IMREAD_GRAYSCALE)
-
+def singleImagePredict(inputPath, modelPath):
+    image_data = cv2.imread(inputPath, cv2.IMREAD_GRAYSCALE)
+    
     # Resize to the same size as Fashion MNIST images
-    #image_data = cv2.resize(image_data, (28, 28))
+    image_data = cv2.resize(image_data, (28, 28))
 
     # Invert image colors
-    #image_data = 255 - image_data
-
-    # Reshape and scale pixel data
-    #image_data = (image_data.reshape(1, -1).astype(np.float32) - 127.5) / 127.5
-
-    # Predict on the image
-    #confidences = model.predict(image_data)
-
-    # Get prediction instead of confidence levels
-    #predictions = model.output_layer_activation.predictions(confidences)
-
-    # Get label name from label index
-    #prediction = fashion_mnist_labels[predictions[0]]
-
-    #print(prediction)
+    image_data = 255 - image_data
     
+    # Reshape and scale pixel data
+    image_data = (image_data.reshape(1, -1).astype(np.float32) - 127.5) / 127.5
+
+    # Load the model
+    print('Importing the model: ' + modelPath)
+    model = Model.load(modelPath)
+    
+    # Predict on the image
+    confidences = model.predict(image_data)
+    print('\nConfidences: ')
+    #for itemConfidences, i in enumerate(confidences):
+        #print('Row ' + str(i) + itemConfidences)
+        #for j in enumerate(itemConfidences):
+        #    print(fashion_mnist_labels[j] + itemConfidences[j]) 
+    
+    print(confidences)
+    
+    # Get prediction instead of confidence levels
+    predictions = model.output_layer_activation.predictions(confidences)
+    print('\nRaw Prediction: ')
+    print(predictions)
+    
+    # Get label name from label index
+    prediction = fashion_mnist_labels[predictions[0]]
+    print('\nPrediction: ')
+    print(prediction)
+
 BASEPATH = "C:\\Users\\bkadmin\\Documents\\"
 
 #trainModel(BASEPATH + 'Datasets\\fashion_mnist_images',
@@ -1425,3 +1438,6 @@ BASEPATH = "C:\\Users\\bkadmin\\Documents\\"
 
 #predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
 #                BASEPATH + '\\Models\\fashion_mnist.model')
+
+singleImagePredict('.\\ch22\\playground\\tshirt.png',
+                   BASEPATH + '\\Models\\fashion_mnist.model')
