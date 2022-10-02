@@ -1436,8 +1436,8 @@ BASEPATH = "C:\\Users\\bkadmin\\Documents\\"
 #           BASEPATH + '\\Models\\fashion_mnist.parms',
 #           BASEPATH + '\\Models\\fashion_mnist.model')
 
-#predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
-#                BASEPATH + '\\Models\\fashion_mnist.model')
+predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
+                BASEPATH + '\\Models\\fashion_mnist.model')
 
-singleImagePredict('.\\ch22\\playground\\tshirt.png',
-                   BASEPATH + '\\Models\\fashion_mnist.model')
+#singleImagePredict('.\\ch22\\playground\\tshirt.png',
+#                   BASEPATH + '\\Models\\fashion_mnist.model')
