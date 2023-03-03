@@ -3,17 +3,17 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
-DATASETS = "C:\\Users\\bkadmin\\Documents\\Datasets\\"
+DATASETS = "C:\\DATASETS\\"
+DATASET = "C:\\DATASETS\\" + "fashion_mnist_images\\"
 
-labels = os.listdir(DATASETS + 'fashion_mnist_images\\train')
+labels = os.listdir(DATASET + 'train')
 print(labels)
 
-files = os.listdir(DATASETS + 'fashion_mnist_images\\train\\4')
+files = os.listdir(DATASET + 'train\\4')
 print(files[:10])
 print(len(files))
 
-image_data = cv2.imread(DATASETS + 'fashion_mnist_images\\train\\4\\0011.png',
-cv2.IMREAD_UNCHANGED)
+image_data = cv2.imread(DATASET + 'train\\4\\0011.png', cv2.IMREAD_UNCHANGED)
 
 np.set_printoptions(linewidth=200)
 print(image_data)

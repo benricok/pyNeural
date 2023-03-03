@@ -1279,7 +1279,7 @@ fashion_mnist_labels = {
     9: 'Ankle boot'
 }    
   
-def trainModel(pathDataset, pathParams, pathModel):
+def trainModel(pathDataset, pathParams, pathModel, epoch_train):
     # Start timer
     start = timeit.default_timer()
     
@@ -1334,7 +1334,7 @@ def trainModel(pathDataset, pathParams, pathModel):
     print('\nStarting training:\n')
     start = timeit.default_timer()
     model.train(X, y, validation_data=(X_test, y_test),
-        epochs=10, batch_size=128, print_every=100)
+        epochs=epoch_train, batch_size=128, print_every=100)
     print('\nDONE TRAINING \nTook: ', round(timeit.default_timer() - start, 2), 'seconds\n') 
     
     # Retrieve and print parameters
@@ -1353,7 +1353,7 @@ def trainModel(pathDataset, pathParams, pathModel):
     print('Params: ' + pathParams)
     print('Model: ' + pathModel)
 
-def predictOnImages(datasetpath, modelPath):
+def predictOnImages(datasetpath, modelPath, i,j):
     # Start timer
     start = timeit.default_timer()
     
@@ -1376,9 +1376,8 @@ def predictOnImages(datasetpath, modelPath):
     
     # Predict on the first j samples from validation dataset
     # and print the result
-    j = 5
     print('\nPredicting the first ' + str(j) + ' test samples')
-    confidences = model.predict(X_test[:j])
+    confidences = model.predict(X_test[i:j])
     print('\nConfidences: ')
     print(confidences)
     
@@ -1430,14 +1429,16 @@ def singleImagePredict(inputPath, modelPath):
     print('\nPrediction: ')
     print(prediction)
 
-BASEPATH = "C:\\Users\\bkadmin\\Documents\\"
+MODEL = "C:\\MODELS\\fashion_mnist"
+DATASETS = "C:\\DATASETS\\"
+DATASET = "C:\\DATASETS\\" + "fashion_mnist_images\\"
 
-#trainModel(BASEPATH + 'Datasets\\fashion_mnist_images',
-#           BASEPATH + '\\Models\\fashion_mnist.parms',
-#           BASEPATH + '\\Models\\fashion_mnist.model')
+#trainModel(DATASET,
+#           MODEL + '\\fashion_mnist.parms',
+#           MODEL + '\\fashion_mnist.model',
+#           30)
 
-predictOnImages(BASEPATH + 'Datasets\\fashion_mnist_images',
-                BASEPATH + '\\Models\\fashion_mnist.model')
+predictOnImages(DATASET, MODEL + '\\fashion_mnist.model', 30, 70)
 
 #singleImagePredict('.\\ch22\\playground\\tshirt.png',
-#                   BASEPATH + '\\Models\\fashion_mnist.model')
+#                  MODEL + '\\fashion_mnist.model')
