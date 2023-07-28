@@ -1433,12 +1433,12 @@ MODEL = "C:\\MODELS\\fashion_mnist"
 DATASETS = "C:\\DATASETS\\"
 DATASET = "C:\\DATASETS\\" + "fashion_mnist_images\\"
 
-#trainModel(DATASET,
-#           MODEL + '\\fashion_mnist.parms',
-#           MODEL + '\\fashion_mnist.model',
-#           30)
+trainModel(DATASET,
+           MODEL + '\\fashion_mnist.parms',
+           MODEL + '\\fashion_mnist.model',
+           30)
 
-predictOnImages(DATASET, MODEL + '\\fashion_mnist.model', 30, 70)
+#predictOnImages(DATASET, MODEL + '\\fashion_mnist.model', 30, 70)
 
 #singleImagePredict('.\\ch22\\playground\\tshirt.png',
 #                  MODEL + '\\fashion_mnist.model')
