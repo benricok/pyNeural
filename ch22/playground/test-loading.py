@@ -1,25 +1,38 @@
-import os
-import cv2
-import numpy as np
+import os, cv2, platform
+import numpy as np 
 import matplotlib.pyplot as plt
 
-DATASETS = "C:\\DATASETS\\"
-DATASET = "C:\\DATASETS\\" + "fashion_mnist_images\\"
+# Windows
+DATASET_W = "C:\\DATASETS\\fashion_mnist_images\\"
 
-labels = os.listdir(DATASET + 'train')
-print(labels)
+# Linux
+DATASET_L = "/datasets/fashion_mnist_images/"
 
-files = os.listdir(DATASET + 'train\\4')
-print(files[:10])
-print(len(files))
+if platform.system() == 'Windows':
+    DATASET = DATASET_W
+elif platform.system() == 'Linux':
+    HOME = os.path.expanduser("~")
+    DATASET = HOME + DATASET_L
 
-image_data = cv2.imread(DATASET + 'train\\4\\0011.png', cv2.IMREAD_UNCHANGED)
+    labels = os.listdir(DATASET + 'train')
+    print(labels)
 
-np.set_printoptions(linewidth=200)
-print(image_data)
+    files = os.listdir(DATASET + 'train/4')
+    print(files[:10])
+    print(len(files))
 
-plt.imshow(image_data, cmap='gray')
-plt.show()
+    image_data_1 = cv2.imread(DATASET + 'train/4/0011.png', cv2.IMREAD_UNCHANGED)
+    image_data_2 = cv2.imread(DATASET + 'train/4/0012.png', cv2.IMREAD_UNCHANGED)
+
+    np.set_printoptions(linewidth=200)
+    print(image_data_1)
+    print(image_data_2)
+
+    plt.imshow(image_data_1, cmap='gray')
+    plt.show()
+
+else:
+    raise Exception("OS not supported")
 
 ## Create lists for samples and labels
 #X = []
